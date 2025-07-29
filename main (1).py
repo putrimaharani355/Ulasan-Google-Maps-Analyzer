@@ -25,7 +25,7 @@ st.markdown("Analisis dan visualisasi ulasan pelanggan berdasarkan data Google M
 uploaded_file = st.file_uploader("📁 Upload CSV File", type=["csv"])
 
 if uploaded_file:
-    df = pd.read_csv(uploaded_file)
+    df = pd.read_csv(uploaded_file,sep=',')
 
     # Validasi kolom
     if 'review' not in df.columns or 'rating' not in df.columns:
