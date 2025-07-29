@@ -27,7 +27,18 @@ st.markdown("Analisis dan visualisasi ulasan pelanggan berdasarkan data Google M
 uploaded_file = st.file_uploader("📁 Upload CSV File", type=["csv"])
 
 if uploaded_file:
-    df = pd.read_csv(uploaded_file,sep=',')
+    import csv
+
+    try:
+        # Deteksi otomatis delimiter (`,` atau `;`)
+        sample = uploaded_file.read(2048).decode('utf-8', errors='ignore')
+        uploaded_file.seek(0)  # Reset pointer
+        sniffer = csv.Sniffer()
+        dialect = sniffer.sniff(sample)
+        df = pd.read_csv(uploaded_file, sep=dialect.delimiter, encoding='utf-8', engine='python')
+    except Exception as e:
+        st.error(f"❌ Failed to read CSV file: {e}")
+        st.stop()
 
     # Validasi kolom
     if 'review' not in df.columns or 'rating' not in df.columns:
