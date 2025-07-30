@@ -1,6 +1,4 @@
 # -*- coding: utf-8 -*-
-# Streamlit App - Google Maps Review Analyzer for XLSX
-
 import streamlit as st
 import pandas as pd
 from textblob import TextBlob
@@ -29,21 +27,18 @@ if uploaded_file:
         st.error(f"❌ Gagal membaca file Excel: {e}")
         st.stop()
 
-    # Validasi kolom
     if 'review' not in df.columns or 'rating' not in df.columns:
         st.error("⚠️ Kolom 'review' dan 'rating' harus ada dalam file Excel.")
         st.stop()
 
-    # Drop NA
     df = df[['review', 'rating']].dropna()
+    df['rating'] = pd.to_numeric(df['rating'], errors='coerce')
+    df = df.dropna(subset=['rating'])
 
-    # Filter rating
     rating_filter = st.slider("⭐ Filter rating:", 1, 5, (1, 5))
     df_filtered = df[df['rating'].between(rating_filter[0], rating_filter[1])]
 
     st.subheader("🔠 Word Cloud")
-
-    # Gabungkan semua teks
     text = " ".join(df_filtered['review'].astype(str).tolist())
     wordcloud = WordCloud(width=800, height=400, background_color='white', colormap='plasma').generate(text)
 
@@ -54,7 +49,6 @@ if uploaded_file:
 
     st.subheader("📊 Sentiment Analysis")
 
-    # Fungsi sentimen
     def get_sentiment(text):
         analysis = TextBlob(str(text))
         polarity = analysis.sentiment.polarity
@@ -78,9 +72,25 @@ if uploaded_file:
         ax2.set_title("Distribusi Sentimen")
         st.pyplot(fig2)
 
+    st.subheader("📋 Jumlah Kata per Rating")
+
+    # Hitung jumlah kata per review
+    df_filtered['Word Count'] = df_filtered['review'].astype(str).apply(lambda x: len(x.split()))
+
+    # Group by rating
+    word_count_per_rating = df_filtered.groupby('rating')['Word Count'].sum().reset_index()
+
+    st.dataframe(word_count_per_rating)
+
+    fig3, ax3 = plt.subplots()
+    sns.barplot(data=word_count_per_rating, x='rating', y='Word Count', palette='viridis', ax=ax3)
+    ax3.set_title("Jumlah Kata per Rating")
+    ax3.set_xlabel("Rating")
+    ax3.set_ylabel("Total Kata")
+    st.pyplot(fig3)
+
     st.subheader("📋 Tabel Kata Terbanyak")
 
-    # Tokenisasi dan hitung kata
     words = re.findall(r'\b\w+\b', text.lower())
     common_words = Counter(words).most_common(20)
     word_df = pd.DataFrame(common_words, columns=['Word', 'Frequency'])
