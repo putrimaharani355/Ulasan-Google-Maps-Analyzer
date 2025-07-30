@@ -12,6 +12,18 @@ import re
 # Setup NLTK
 nltk.download('punkt')
 nltk.download('averaged_perceptron_tagger')
+nltk.download('stopwords')
+
+from nltk.corpus import stopwords
+
+# Buat daftar stopword (EN + ID)
+stopwords_en = set(stopwords.words('english'))
+stopwords_id = set([
+    "yang", "dan", "di", "ke", "dari", "untuk", "dengan", "pada", "adalah", "itu",
+    "ini", "saya", "kami", "mereka", "tidak", "ya", "atau", "juga", "karena", "sebagai", 
+    "oleh", "agar", "sudah", "masih", "saja", "lebih", "dalam", "bisa"
+])
+custom_stopwords = stopwords_en.union(stopwords_id)
 
 st.set_page_config(page_title="Google Maps Review Analyzer", layout="wide")
 st.title("🗺️ Google Maps Review Analyzer")
@@ -26,23 +38,26 @@ if uploaded_file:
         st.error(f"❌ Gagal membaca file Excel: {e}")
         st.stop()
 
-    # Pastikan kolom utama ada
+    # Validasi kolom
     if 'review' not in df.columns or 'rating' not in df.columns:
         st.error("⚠️ File harus memiliki kolom `review` dan `rating`.")
         st.stop()
 
-    # Bersihkan data
     df = df[['review', 'rating']].copy()
     df['rating'] = pd.to_numeric(df['rating'], errors='coerce')
     df = df.dropna(subset=['review', 'rating'])
 
-    # Filter rating
     rating_filter = st.slider("⭐ Filter rating:", 1, 5, (1, 5))
     df_filtered = df[df['rating'].between(rating_filter[0], rating_filter[1])]
 
     st.subheader("🔠 Word Cloud")
-    text = " ".join(df_filtered['review'].astype(str).tolist())
-    wordcloud = WordCloud(width=800, height=400, background_color='white', colormap='plasma').generate(text)
+
+    # Gabungkan dan bersihkan teks, buang stopword
+    words = re.findall(r'\b\w+\b', " ".join(df_filtered['review'].astype(str)).lower())
+    filtered_words = [word for word in words if word not in custom_stopwords and len(word) > 2]
+    cleaned_text = " ".join(filtered_words)
+
+    wordcloud = WordCloud(width=800, height=400, background_color='white', colormap='plasma').generate(cleaned_text)
 
     fig, ax = plt.subplots(figsize=(10, 5))
     ax.imshow(wordcloud, interpolation="bilinear")
@@ -84,9 +99,8 @@ if uploaded_file:
     ax3.set_title("Total Kata per Rating")
     st.pyplot(fig3)
 
-    st.subheader("📋 20 Kata Terbanyak")
-    words = re.findall(r'\b\w+\b', text.lower())
-    common_words = Counter(words).most_common(20)
+    st.subheader("📋 20 Kata Terbanyak (tanpa stopword)")
+    common_words = Counter(filtered_words).most_common(20)
     word_df = pd.DataFrame(common_words, columns=['Word', 'Frequency'])
     st.dataframe(word_df)
 
