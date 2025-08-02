@@ -50,6 +50,16 @@ if uploaded_file:
     rating_filter = st.slider("⭐ Filter rating:", 1, 5, (1, 5))
     df_filtered = df[df['rating'].between(rating_filter[0], rating_filter[1])]
 
+    st.subheader("📏 Jumlah Kata per Rating")
+    df_filtered['Word Count'] = df_filtered['review'].astype(str).apply(lambda x: len(x.split()))
+    word_count_by_rating = df_filtered.groupby('rating')['Word Count'].sum().reset_index()
+    st.dataframe(word_count_by_rating)
+
+    fig3, ax3 = plt.subplots()
+    sns.barplot(data=word_count_by_rating, x='rating', y='Word Count', palette='viridis', ax=ax3)
+    ax3.set_title("Total Kata per Rating")
+    st.pyplot(fig3)
+
     st.subheader("🔠 Word Cloud")
 
     # Gabungkan dan bersihkan teks, buang stopword
@@ -63,6 +73,11 @@ if uploaded_file:
     ax.imshow(wordcloud, interpolation="bilinear")
     ax.axis("off")
     st.pyplot(fig)
+   
+    st.subheader("📋 20 Kata Terbanyak (tanpa stopword)")
+    common_words = Counter(filtered_words).most_common(20)
+    word_df = pd.DataFrame(common_words, columns=['Word', 'Frequency'])
+    st.dataframe(word_df)
 
     st.subheader("📊 Sentiment Analysis")
 
@@ -89,20 +104,7 @@ if uploaded_file:
         ax2.set_title("Distribusi Sentimen")
         st.pyplot(fig2)
 
-    st.subheader("📏 Jumlah Kata per Rating")
-    df_filtered['Word Count'] = df_filtered['review'].astype(str).apply(lambda x: len(x.split()))
-    word_count_by_rating = df_filtered.groupby('rating')['Word Count'].sum().reset_index()
-    st.dataframe(word_count_by_rating)
 
-    fig3, ax3 = plt.subplots()
-    sns.barplot(data=word_count_by_rating, x='rating', y='Word Count', palette='viridis', ax=ax3)
-    ax3.set_title("Total Kata per Rating")
-    st.pyplot(fig3)
-
-    st.subheader("📋 20 Kata Terbanyak (tanpa stopword)")
-    common_words = Counter(filtered_words).most_common(20)
-    word_df = pd.DataFrame(common_words, columns=['Word', 'Frequency'])
-    st.dataframe(word_df)
 
 else:
     st.info("👈 Silakan upload file Excel (.xlsx) yang memiliki kolom `review` dan `rating`.")
