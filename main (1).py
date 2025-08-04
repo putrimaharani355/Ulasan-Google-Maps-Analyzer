@@ -50,10 +50,9 @@ if uploaded_file:
     rating_filter = st.slider("⭐ Filter rating:", 1, 5, (1, 5))
     df_filtered = df[df['rating'].between(rating_filter[0], rating_filter[1])]
 
-    st.subheader("📏 Jumlah Kata per Rating")
-    df_filtered['Word Count'] = df_filtered['review'].astype(str).apply(lambda x: len(x.split()))
-    word_count_by_rating = df_filtered.groupby('rating')['Word Count'].sum().reset_index()
-    st.dataframe(word_count_by_rating)
+    st.subheader("📊 Jumlah Review per Rating")
+    review_count_by_rating = df_filtered.groupby('rating')['review'].count().reset_index(name='Jumlah Review')
+    st.dataframe(review_count_by_rating)
 
     fig3, ax3 = plt.subplots()
     sns.barplot(data=word_count_by_rating, x='rating', y='Word Count', palette='viridis', ax=ax3)
