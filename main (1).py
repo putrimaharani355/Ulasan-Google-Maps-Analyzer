@@ -58,7 +58,8 @@ if uploaded_file:
     sns.barplot(data=review_count_by_rating, x='rating', y='review_count_by_rating', palette='viridis', ax=ax3)
     ax3.set_title("Jumlah review per Rating")
     st.pyplot(fig3)
-
+    df_filtered['Word Count'] = df_filtered['review'].astype(str).apply(lambda x: len(x.split()))
+    word_count_by_rating = df_filtered.groupby('rating')['Word Count'].sum().reset_index()
     st.subheader("🔠 Word Cloud")
 
     # Gabungkan dan bersihkan teks, buang stopword
