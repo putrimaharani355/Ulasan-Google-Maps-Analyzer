@@ -54,15 +54,27 @@ if uploaded_file:
     
     review_count = df.groupby('rating')['review'].count().reset_index(name='Jumlah Review')
     
+    st.subheader("📊 Jumlah Review per Rating")
+    
+    review_count = df.groupby('rating')['review'].count().reset_index(name='Jumlah Review')
+    
     sns.set_style("whitegrid")
     fig1, ax1 = plt.subplots()
-    sns.barplot(data=review_count, x="rating", y="Jumlah Review", palette="Blues_d", ax=ax1)
+    
+    # Buat barplot
+    barplot = sns.barplot(data=review_count, x="rating", y="Jumlah Review", palette="Blues_d", ax=ax1)
+    
+    # Tambahkan label angka di atas setiap bar
+    for p in barplot.patches:
+        height = p.get_height()
+        ax1.text(
+            p.get_x() + p.get_width() / 2.,   # posisi tengah bar
+            height + 1,                       # sedikit di atas bar
+            f'{int(height)}',                # teks label
+            ha="center", va="bottom", fontsize=10
+        )
+    
     st.pyplot(fig1)
-
-    fig3, ax3 = plt.subplots()
-    sns.barplot(data=review_count_by_rating, x='rating', y='review_count_by_rating', palette='viridis', ax=ax3)
-    ax3.set_title("Jumlah review per Rating")
-    st.pyplot(fig3)
 
     st.subheader("🔠 Word Cloud")
 
