@@ -51,9 +51,13 @@ if uploaded_file:
     df_filtered = df[df['rating'].between(rating_filter[0], rating_filter[1])]
 
     st.subheader("📊 Jumlah Review per Rating")
-    review_count_by_rating = df.groupby("rating").size().reset_index(name="review_count_by_rating")
-    sns.barplot(data=review_count_by_rating, x="rating", y="review_count_by_rating", palette="viridis", ax=ax3)
-    st.dataframe(review_count_by_rating)
+    
+    review_count = df.groupby('rating')['review'].count().reset_index(name='Jumlah Review')
+    
+    sns.set_style("whitegrid")
+    fig1, ax1 = plt.subplots()
+    sns.barplot(data=review_count, x="rating", y="Jumlah Review", palette="Blues_d", ax=ax1)
+    st.pyplot(fig1)
 
     fig3, ax3 = plt.subplots()
     sns.barplot(data=review_count_by_rating, x='rating', y='review_count_by_rating', palette='viridis', ax=ax3)
