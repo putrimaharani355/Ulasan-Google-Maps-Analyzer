@@ -51,15 +51,15 @@ if uploaded_file:
     df_filtered = df[df['rating'].between(rating_filter[0], rating_filter[1])]
 
     st.subheader("📊 Jumlah Review per Rating")
-    review_count_by_rating = df_filtered.groupby('rating')['review'].count().reset_index(name='Jumlah Review')
+    review_count_by_rating = df_reviews.groupby("rating").size().reset_index(name="review_count_by_rating")
+    sns.barplot(data=review_count_by_rating, x="rating", y="review_count_by_rating", palette="viridis", ax=ax3)
     st.dataframe(review_count_by_rating)
 
     fig3, ax3 = plt.subplots()
     sns.barplot(data=review_count_by_rating, x='rating', y='review_count_by_rating', palette='viridis', ax=ax3)
     ax3.set_title("Jumlah review per Rating")
     st.pyplot(fig3)
-    df_filtered['Word Count'] = df_filtered['review'].astype(str).apply(lambda x: len(x.split()))
-    word_count_by_rating = df_filtered.groupby('rating')['Word Count'].sum().reset_index()
+
     st.subheader("🔠 Word Cloud")
 
     # Gabungkan dan bersihkan teks, buang stopword
