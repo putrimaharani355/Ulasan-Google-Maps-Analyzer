@@ -21,7 +21,7 @@ stopwords_en = set(stopwords.words('english'))
 stopwords_id = set([
     "yang", "dan", "di", "ke", "dari", "untuk", "dengan", "pada", "adalah", "itu",
     "ini", "saya", "kami", "mereka", "tidak", "ya", "atau", "juga", "karena", "sebagai", 
-    "oleh", "agar", "sudah", "masih", "saja", "lebih", "dalam", "bisa"
+    "oleh", "agar", "sudah", "masih", "saja", "lebih", "dalam", "bisa", "persada", "indonesia"
 ])
 custom_stopwords = stopwords_en.union(stopwords_id)
 
@@ -52,12 +52,7 @@ if uploaded_file:
 
     st.subheader("📊 Jumlah Review per Rating")
     
-    review_count = df.groupby('rating')['review'].count().reset_index(name='Jumlah Review')
-    
-    st.subheader("📊 Jumlah Review per Rating")
-    
-    review_count = df.groupby('rating')['review'].count().reset_index(name='Jumlah Review')
-    
+    review_count = df.groupby('rating')['review'].count().reset_index(name='Jumlah Review')  
     sns.set_style("whitegrid")
     fig1, ax1 = plt.subplots()
     
@@ -90,7 +85,7 @@ if uploaded_file:
     ax.axis("off")
     st.pyplot(fig)
    
-    st.subheader("📋 20 Kata Terbanyak (tanpa stopword)")
+    st.subheader("📋 20 Kata Terbanyak")
     common_words = Counter(filtered_words).most_common(20)
     word_df = pd.DataFrame(common_words, columns=['Word', 'Frequency'])
     st.dataframe(word_df)
