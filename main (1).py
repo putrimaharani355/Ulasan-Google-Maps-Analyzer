@@ -55,7 +55,7 @@ if uploaded_file:
     st.dataframe(review_count_by_rating)
 
     fig3, ax3 = plt.subplots()
-    sns.barplot(data=word_count_by_rating, x='rating', y='review_count_by_rating', palette='viridis', ax=ax3)
+    sns.barplot(data=review_count_by_rating, x='rating', y='review_count_by_rating', palette='viridis', ax=ax3)
     ax3.set_title("Jumlah review per Rating")
     st.pyplot(fig3)
 
