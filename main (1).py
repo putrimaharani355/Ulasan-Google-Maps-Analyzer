@@ -51,7 +51,7 @@ if uploaded_file:
     df_filtered = df[df['rating'].between(rating_filter[0], rating_filter[1])]
 
     st.subheader("📊 Jumlah Review per Rating")
-    review_count_by_rating = df_reviews.groupby("rating").size().reset_index(name="review_count_by_rating")
+    review_count_by_rating = df.groupby("rating").size().reset_index(name="review_count_by_rating")
     sns.barplot(data=review_count_by_rating, x="rating", y="review_count_by_rating", palette="viridis", ax=ax3)
     st.dataframe(review_count_by_rating)
 
